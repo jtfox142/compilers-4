@@ -1,0 +1,8 @@
+statSem
+*.o
+*.txt
+*.preorder
+*.postorder
+*.inorder
+
+.vscode
