@@ -115,7 +115,7 @@ namespace node {
                 return data;
             }
 
-            const int getChildNum() {
+            const int getChildNum() { //Returns which child number should be set next
                 return childNum;
             }
 

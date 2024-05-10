@@ -146,8 +146,58 @@ token::Token scanner::getNextToken() {
     //If the beginning char is a letter, then it is an identifier token
     if(isalpha(beginningChar)) {
         //Check for reserved words
-        if(isKeyword(filteredString))
-            token.tokenId = token::tokenIdList::keyTok;
+        if(isKeyword(filteredString)) {
+            if(filteredString == "start")
+                token.tokenId = token::tokenIdList::startTok;
+            else if(filteredString == "stop") {
+                token.tokenId = token::tokenIdList::stopTok;
+            }
+            else if(filteredString == "while") {
+                token.tokenId = token::tokenIdList::whileTok;
+            }
+            else if(filteredString == "repeat") {
+                token.tokenId = token::tokenIdList::repeatTok;
+            }
+            else if(filteredString == "until") {
+                token.tokenId = token::tokenIdList::untilTok;
+            }
+            else if(filteredString == "label") {
+                token.tokenId = token::tokenIdList::labelTok;
+            }
+            else if(filteredString == "return") {
+                token.tokenId = token::tokenIdList::returnTok;
+            }
+            else if(filteredString == "cin") {
+                token.tokenId = token::tokenIdList::readTok;
+            }
+            else if(filteredString == "cout") {
+                token.tokenId = token::tokenIdList::writeTok;
+            }
+            else if(filteredString == "tape") {
+                token.tokenId = token::tokenIdList::tapeTok;
+            }
+            else if(filteredString == "jump") {
+                token.tokenId = token::tokenIdList::jumpTok;
+            }
+            else if(filteredString == "if") {
+                token.tokenId = token::tokenIdList::ifTok;
+            }
+            else if(filteredString == "then") {
+                token.tokenId = token::tokenIdList::thenTok;
+            }
+            else if(filteredString == "pick") {
+                token.tokenId = token::tokenIdList::pickTok;
+            }
+            else if(filteredString == "create") {
+                token.tokenId = token::tokenIdList::createTok;
+            }
+            else if(filteredString == "set") {
+                token.tokenId = token::tokenIdList::assignTok;
+            }
+            else if(filteredString == "func") {
+                token.tokenId = token::tokenIdList::funcTok;
+            }
+        }
         else {
             //Checks the word for illegal characters
             if(isValidIdTok(filteredString)) 

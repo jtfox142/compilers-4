@@ -2,7 +2,7 @@ CC = g++
 
 CFLAGS = -Wall -std=c++11
 
-statSem: p4.o scanner.o parser.o tree.o statSem.o symbolTable.o
+compfs: p4.o scanner.o parser.o tree.o statSem.o symbolTable.o
 	$(CC) $(CFLAGS) -o statSem p4.o scanner.o parser.o tree.o statSem.o symbolTable.o
 
 p4.o: p4.cpp parser.cpp parser.hpp scanner.cpp scanner.hpp tree.hpp token.hpp statSem.cpp statSem.hpp

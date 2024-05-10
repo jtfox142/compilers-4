@@ -7,7 +7,8 @@
 
 namespace token {
 
-    enum tokenIdList { idTok, keyTok, opTok, intTok, EOFTok};
+    enum tokenIdList { idTok, startTok, stopTok, whileTok, repeatTok, untilTok, labelTok, returnTok, readTok, writeTok,
+                        tapeTok, jumpTok, ifTok, thenTok, pickTok, createTok, assignTok, funcTok, opTok, intTok, EOFTok};
 
     class Token {
 
