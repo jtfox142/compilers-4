@@ -17,7 +17,7 @@ std::string setFileName(int argc, char* argv[]) {
         //std::cout << "Opening a default file to handle input." << std::endl;
 
         std::ofstream defaultFile;
-        fileName = "kb.asm";
+        fileName = "default.txt";
 
         //Need to convert string to c string for .open() function call
         defaultFile.open(fileName.c_str(), std::ios::out | std::ios::trunc);
@@ -38,9 +38,16 @@ std::string setFileName(int argc, char* argv[]) {
 }
 
 std::string getOutputFile(std::string fileName) {
-    int pos = fileName.find(".");
-    std::string outputFilePretext = fileName.substr(0, pos);
-    fileName = outputFilePretext + ".preorder";
+    std::string outputFileName;
+    if(outputFileName == "default.txt") {
+        fileName = "kb.asm";
+    }
+    else {
+        int pos = fileName.find(".");
+        std::string outputFilePretext = fileName.substr(0, pos);
+        outputFileName = outputFilePretext + ".asm";
+    }
+    return outputFileName;
 }
 
 int main(int argc, char* argv[]) {
@@ -51,8 +58,8 @@ int main(int argc, char* argv[]) {
     try {
         scanner::startStream(fileName);
         node::Node* tree = parser::parse();
-        statSem::driver(tree);
-        codeGeneration::recGen(tree, getOutputFile(fileName))
+        std::string outputFileName = getOutputFile(fileName);
+        statSem::driver(tree, outputFileName);
     } catch(const std::exception& ex) {
         std::cerr << ex.what() << '\n';
         exit(1);

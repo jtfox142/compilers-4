@@ -66,9 +66,9 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         return;
     }
     else if(root->getData().tokenInstance == "out()") { //<out> -> cout <expr>
-        //TODO FIX THIS
-        std::string temp = codeGeneration::processExpr(root->getChildTwo()->getData());
-        codeGeneration::produceCout(temp);
+        //Fetches the number of the temporary variable that the result of expr has been stored in
+        std::string tempVarNum = codeGeneration::processExpr(root->getChildTwo());
+        codeGeneration::produceCout(tempVarNum);
         return;
     }
     else if(root->getData().tokenInstance == "expr()") { //<expr> -> <N> - <expr> | <N>
@@ -77,7 +77,7 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
             This one is gonna be more complex. Gonna have to create temporary variables for this.
             Expr should probably just return the value of a temporary var (int) instead of assembly lang jargon.
         */
-        codeGeneration::processExpr(root->getData()); //Send the entire subtree to expr
+        codeGeneration::processExpr(root); //Send the entire subtree to expr
         return;
     }
     else if(root->getData().tokenId == token::idTok) {
@@ -136,7 +136,7 @@ void processVars(node::Node *root, symbolTable::Scope *local) {
             if(root->getChildThree()->getData().tokenInstance == ":=") { //If the var is assigned a value, fetch that value
                 assignValue = root->getChildFour()->getData().tokenInstance;
             }
-            codeGeneration::produceVars(token, assignValue);
+            codeGeneration::produceVars(token.tokenInstance, assignValue); 
 
             //std::cout << "Token pushed successfully\n";
         }
