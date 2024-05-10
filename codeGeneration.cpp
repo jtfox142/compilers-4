@@ -7,7 +7,12 @@
 #include <string>
 
 //Prototypes
-std::string processN(token::Token tok);
+std::string processN(node::Node *node);
+std::string processA(node::Node *node);
+std::string processNPrime(node::Node *node, std::string tempVarPrevious);
+void processM(node::Node *node);
+void processR(node::Node *node);
+
 
 namespace {
     static int _labelCntr=0; /* counting unique labels generated */
