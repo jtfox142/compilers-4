@@ -2,6 +2,9 @@
 #include "statSem.hpp"
 #include "symbolTable.hpp"
 #include "token.hpp"
+#include "codeGeneration.hpp"
+
+#include <fstream>
 
 //Prototypes
 void processBlock(node::Node*);
@@ -16,10 +19,12 @@ namespace {
 
 }
 
-void statSem::driver(node::Node *tree) {
+void statSem::driver(node::Node *tree, std::string filename) {
     //<program> -> <vars> tape <func> <block> | <vars> tape <block>
 
+    codeGeneration::setOutputFile(filename);
     traversePreorder(tree, _globalSTV);
+    codeGeneration::declareAllVars(); //Declare all vars at the end of the program
 
     std::cout << "Program successfully passed static semantic check." << std::endl;
 }
@@ -42,14 +47,37 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         return;
     }
     else if(root->getData().tokenInstance == "func()") { //<func> -> func Identifier <block>
-        //skip processing func identifier
+        //skip processing func identifier in static semantics pass
         //std::cout << "Calling func()\n";
+        //produce code generation for func
+        codeGeneration::produceLabel(root->getChildTwo()->getData()); //TODO: wrong. Need to implement functions inplace
         traversePreorder(root->getChildThree(), scope);
         return;
     }
     else if(root->getData().tokenInstance == "goto()") { //<goto> -> jump Identifier
-        //skip processing function identifier, because I'm only supposed to process vars
+        //skip processing function identifier in static semantics
         //std::cout << "Skipping goto()\n";
+        //produce code gen for goto
+        codeGeneration::produceJump(root->getChildTwo()->getData());
+        return;
+    }
+    else if(root->getData().tokenInstance == "in()") { //<in> -> cin Identifier
+        codeGeneration::produceCin(root->getChildTwo()->getData());
+        return;
+    }
+    else if(root->getData().tokenInstance == "out()") { //<out> -> cout <expr>
+        //TODO FIX THIS
+        std::string temp = codeGeneration::processExpr(root->getChildTwo()->getData());
+        codeGeneration::produceCout(temp);
+        return;
+    }
+    else if(root->getData().tokenInstance == "expr()") { //<expr> -> <N> - <expr> | <N>
+        /*
+        TODO
+            This one is gonna be more complex. Gonna have to create temporary variables for this.
+            Expr should probably just return the value of a temporary var (int) instead of assembly lang jargon.
+        */
+        codeGeneration::processExpr(root->getData()); //Send the entire subtree to expr
         return;
     }
     else if(root->getData().tokenId == token::idTok) {
@@ -102,6 +130,14 @@ void processVars(node::Node *root, symbolTable::Scope *local) {
         if(local->find(token) == -1 && symbolTable::verify(token) == false) {
             //std::cout << "Pushing token " << token.tokenInstance << " onto the stack.\n";
             local->push(token);
+
+            //Generate code for vars
+            std::string assignValue = "-7"; //Default integer value
+            if(root->getChildThree()->getData().tokenInstance == ":=") { //If the var is assigned a value, fetch that value
+                assignValue = root->getChildFour()->getData().tokenInstance;
+            }
+            codeGeneration::produceVars(token, assignValue);
+
             //std::cout << "Token pushed successfully\n";
         }
         else {
@@ -116,6 +152,7 @@ void processVars(node::Node *root, symbolTable::Scope *local) {
     }
 }
 
+//Checks if a var exists in local scope, then in global scope. If not, error
 void processIdentifier(node::Node *root, symbolTable::Scope *local) {
     if(local->find(root->getData()) == -1) {
         bool inGlobal = symbolTable::verify(root->getData());
