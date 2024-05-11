@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     try {
         scanner::startStream(fileName);
         node::Node* tree = parser::parse();
-        tree::printPreorder(tree, 0);
+        //tree::printPreorder(tree, 0);
         std::string outputFileName = getOutputFile(fileName);
         statSem::driver(tree, outputFileName);
     } catch(const std::exception& ex) {

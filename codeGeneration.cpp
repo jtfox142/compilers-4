@@ -320,11 +320,11 @@ void codeGeneration::processLoop2(node::Node *node) { //<loop2> -> repeat <stat>
 //<stat> -> <in> ; | <out> ; | <block> | <if> ; | <loop1> ; | <loop2> ; | <assign> ; |
 //<goto> ; | <label> ; | <pick> ;
 void processStat(node::Node *node) {
-    std::cout << "entering stat \n";
+    //std::cout << "entering stat \n";
     node::Node *child = node->getChildOne();
     std::string token = child->getData().tokenInstance;
 
-    std::cout<<"In stat. Token is " << token << std::endl;
+    //std::cout<<"In stat. Token is " << token << std::endl;
 
     if(token == "in()") {
         codeGeneration::produceCin(child->getChildTwo()->getData());
@@ -371,7 +371,7 @@ void processBlock(node::Node *node) { //<block> -> { <vars> <stats> }
 }
 
 void codeGeneration::processStats(node::Node *node) { //<stats> -> <stat> <mStat>
-    std::cout << "Entering stats";
+    //std::cout << "Entering stats\n";
     processStat(node->getChildOne());
     processMStat(node->getChildTwo());
 }
@@ -420,7 +420,7 @@ void codeGeneration::processIf(node::Node *node) { //<if> -> if [ <expr> <RO> <e
 }
 
 void processAssign(node::Node *node) { //<assign> -> set Identifier = <expr> | Identifier = <expr>
-    std::cout << "In processAssign\n";
+    //std::cout << "In processAssign\n";
     std::string tempVar;
     if(node->getChildFour()) {
         tempVar = codeGeneration::processExpr(node->getChildFour());
@@ -430,7 +430,7 @@ void processAssign(node::Node *node) { //<assign> -> set Identifier = <expr> | I
     else {
         tempVar = codeGeneration::processExpr(node->getChildThree());
         _out << "LOAD T" + tempVar + "\n";
-        std::cout << "trying to store to x" << std::endl;
+        //std::cout << "trying to store to x" << std::endl;
         _out << "STORE " + node->getChildOne()->getData().tokenInstance + "\n";
     }
 }
