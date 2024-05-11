@@ -105,11 +105,6 @@ void scanner::startStream(std::string fileName) {
 //then checks for errors or reserved words
 token::Token scanner::getNextToken() {
     //std::cout << "Getting next token\n";
-    
-    if(_lineNumber == _commentLine) {
-        //std::cout << "Skipping comment line.\n";
-        getNextLine();
-    }
 
     if(_stringLine.eof()) {
         //std::cout << "Reached ss eof.\n";
@@ -132,13 +127,19 @@ token::Token scanner::getNextToken() {
             token::Token eof(token::tokenIdList::EOFTok, "EOF", _lineNumber, 0);
             return eof;
         }
-        else
-            return (token::Token());
+        else {
+            //TODO Recursively call getNextToken?
+            token = scanner::getNextToken(); //Successfully passed filter
+            filteredString = token.tokenInstance;
+        }
     }
 
+    //--comment is only returned if the ENTIRE LINE is a comment: str.length == 0 after erasing everything past //
     if(filteredString == "--comment") {
         //std::cout << "Comment detected.\n";
-        return (token::Token());
+        getNextLine();
+        token = scanner::getNextToken(); //Successfully passed filter
+        filteredString = token.tokenInstance;
     }
 
     char beginningChar = filteredString.at(0);
