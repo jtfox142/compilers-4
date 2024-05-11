@@ -369,7 +369,7 @@ node::Node* stat() {
     else if(token == "repeat") {
         tree::insert(loop2(), root);
     }
-    else if(token == "set") {
+    else if(token == "set" || _lookahead.tokenId == token::tokenIdList::idTok) {
         tree::insert(assign(), root);
     }
     else if(token == "jump") {

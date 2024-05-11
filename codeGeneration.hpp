@@ -19,6 +19,7 @@ namespace codeGeneration {
     void processLoop1(node::Node*);
     void processLoop2(node::Node*);
     void processIf(node::Node*);
+    void processStats(node::Node*);
 
 
 } //namespace codeGeneration

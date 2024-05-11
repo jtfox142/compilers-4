@@ -26,7 +26,7 @@ void statSem::driver(node::Node *tree, std::string filename) {
     traversePreorder(tree, _globalSTV);
     codeGeneration::stopAndDeclareAllVars(); //Declare all vars at the end of the program
 
-    std::cout << "Program successfully passed static semantic check." << std::endl;
+    std::cout << filename << std::endl;
 }
 
 //root, left, middle, right
@@ -38,6 +38,7 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         //std::cout << "Calling block()\n";
         //Create a new scope to operate in
         processBlockScope(root);
+        //codeGeneration::processBlock(root);
         return;
     }
     else if(root->getData().tokenInstance == "vars()") {
@@ -54,7 +55,7 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         traversePreorder(root->getChildThree(), scope);
         return;
     }
-    else if(root->getData().tokenInstance == "label()") { // <label> -> label Identifier
+    /*else if(root->getData().tokenInstance == "label()") { // <label> -> label Identifier
         codeGeneration::produceLabel(root->getChildTwo()->getData().tokenInstance);
         return;
     }
@@ -67,12 +68,6 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
     }
     else if(root->getData().tokenInstance == "in()") { //<in> -> cin Identifier
         codeGeneration::produceCin(root->getChildTwo()->getData());
-        return;
-    }
-    else if(root->getData().tokenInstance == "out()") { //<out> -> cout <expr>
-        //Fetches the number of the temporary variable that the result of expr has been stored in
-        std::string tempVarNum = codeGeneration::processExpr(root->getChildTwo());
-        codeGeneration::produceCout(tempVarNum);
         return;
     }
     else if(root->getData().tokenInstance == "expr()") { //<expr> -> <N> - <expr> | <N>
@@ -89,6 +84,10 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
     }
     else if(root->getData().tokenInstance == "if()") { //<if> -> if [ <expr> <RO> <expr> ] then <stat>
         codeGeneration::processIf(root); //Send the entire subtree to if
+        return;
+    }*/
+    else if(root->getData().tokenInstance == "stats()") {
+        codeGeneration::processStats(root);
         return;
     }
     else if(root->getData().tokenId == token::idTok) {
