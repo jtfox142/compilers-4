@@ -3,7 +3,7 @@ CC = g++
 CFLAGS = -Wall -std=c++11
 
 compfs: p4.o scanner.o parser.o tree.o statSem.o symbolTable.o codeGeneration.o
-	$(CC) $(CFLAGS) -o statSem p4.o scanner.o parser.o tree.o statSem.o symbolTable.o codeGeneration.o
+	$(CC) $(CFLAGS) -o compfs p4.o scanner.o parser.o tree.o statSem.o symbolTable.o codeGeneration.o
 
 p4.o: p4.cpp parser.cpp parser.hpp scanner.cpp scanner.hpp tree.hpp token.hpp statSem.cpp statSem.hpp
 	$(CC) $(CFLAGS) -c p4.cpp
@@ -27,4 +27,4 @@ codeGeneration.o: codeGeneration.cpp codeGeneration.hpp node.hpp token.hpp
 	$(CC) $(CFLAGS) -c codeGeneration.cpp
 
 clean: 
-	rm *.o statSem
+	rm *.o *.asm compfs

@@ -24,7 +24,7 @@ void statSem::driver(node::Node *tree, std::string filename) {
 
     codeGeneration::setOutputFile(filename);
     traversePreorder(tree, _globalSTV);
-    codeGeneration::declareAllVars(); //Declare all vars at the end of the program
+    codeGeneration::stopAndDeclareAllVars(); //Declare all vars at the end of the program
 
     std::cout << "Program successfully passed static semantic check." << std::endl;
 }
@@ -50,8 +50,12 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         //skip processing func identifier in static semantics pass
         //std::cout << "Calling func()\n";
         //produce code generation for func
-        codeGeneration::produceLabel(root->getChildTwo()->getData()); //TODO: wrong. Need to implement functions inplace
+        //codeGeneration::produceLabel(root->getChildTwo()->getData()); //TODO: wrong. Need to implement functions inplace
         traversePreorder(root->getChildThree(), scope);
+        return;
+    }
+    else if(root->getData().tokenInstance == "label()") { // <label> -> label Identifier
+        codeGeneration::produceLabel(root->getChildTwo()->getData().tokenInstance);
         return;
     }
     else if(root->getData().tokenInstance == "goto()") { //<goto> -> jump Identifier
@@ -72,14 +76,24 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         return;
     }
     else if(root->getData().tokenInstance == "expr()") { //<expr> -> <N> - <expr> | <N>
-        /*
-        TODO
-            This one is gonna be more complex. Gonna have to create temporary variables for this.
-            Expr should probably just return the value of a temporary var (int) instead of assembly lang jargon.
-        */
-        codeGeneration::processExpr(root); //Send the entire subtree to expr
+        codeGeneration::processExpr(root); //Send the entire subtree
         return;
     }
+    else if(root->getData().tokenInstance == "loop1()") { //<loop1> -> while [ <expr> <RO> <expr> ] <stat>
+        codeGeneration::processLoop1(root); //Send the entire subtree
+        return;
+    }
+    else if(root->getData().tokenInstance == "loop2()") { //<loop1> -> while [ <expr> <RO> <expr> ] <stat>
+        codeGeneration::processLoop2(root); //Send the entire subtree
+        return;
+    }
+    /*
+    TODO
+    else if(root->getData().tokenInstance == "if()") { //<if> -> if [ <expr> <RO> <expr> ] then <stat>
+        codeGeneration::processIf(root); //Send the entire subtree to if
+        return;
+    }
+    */
     else if(root->getData().tokenId == token::idTok) {
         //std::cout << "Line " << root->getData().lineNumber << ": calling processIdentifier() for " << root->getData().tokenInstance << std::endl;
         processIdentifier(root, scope);

@@ -1,6 +1,9 @@
 statSem
+compfs
+
 *.o
 *.txt
+*.asm
 *.preorder
 *.postorder
 *.inorder
