@@ -18,6 +18,7 @@ namespace codeGeneration {
     std::string processExpr(node::Node*);
     void processLoop1(node::Node*);
     void processLoop2(node::Node*);
+    void processIf(node::Node*);
 
 
 } //namespace codeGeneration

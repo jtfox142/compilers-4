@@ -13,6 +13,10 @@ std::string processNPrime(node::Node *node, std::string tempVarPrevious);
 void processM(node::Node *node);
 void processR(node::Node *node);
 void processStat(node::Node *node);
+void processStats(node::Node *node);
+void processMStat(node::Node *node);
+void processBlock(node::Node *node);
+void codeGeneration::processIf(node::Node *node);
 
 
 namespace {
@@ -322,35 +326,100 @@ void codeGeneration::processLoop2(node::Node *node) { //<loop2> -> repeat <stat>
 //<goto> ; | <label> ; | <pick> ;
 void processStat(node::Node *node) {
     node::Node *child = node->getChildOne();
-    std::string token = child->getChildOne()->getData().tokenInstance;
-    if(token == "cin") {
+    std::string token = child->getData().tokenInstance;
+
+    std::cout<<"In stat. Token is " << token << std::endl;
+
+    if(token == "in()") {
         codeGeneration::produceCin(child->getChildTwo()->getData());
     }
-    else if(token == "cout") {
+    else if(token == "out()") {
         std::string tempVarNum = codeGeneration::processExpr(child->getChildTwo());
         codeGeneration::produceCout(tempVarNum);
     }
-    /*else if(token == "if") { //TODO
-        tree::insert(ifNonTerminal(), root);
-    }*/
-    else if(token == "while") {
+    else if(token == "block()") {
+        processBlock(child);
+    }
+    else if(token == "if()") {
+        codeGeneration::processIf(child);
+    }
+    else if(token == "loop1()") {
         codeGeneration::processLoop1(child);
     }
-    else if(token == "repeat") {
+    else if(token == "loop2()") {
         codeGeneration::processLoop2(child);
     }
     /*else if(token == "set") {
         tree::insert(assign(), root);
     }*/ //TODO
-    else if(token == "jump") {
+    else if(token == "goto()") {
         codeGeneration::produceJump(child->getChildTwo()->getData());
     }
-    else if(token == "label") {
+    else if(token == "label()") {
         codeGeneration::produceLabel(child->getChildTwo()->getData().tokenInstance);
     }
-    /*else if(token == "pick") { //TODO
+    /*else if(token == "pick()") { //TODO
         tree::insert(pick(), root);
     }*/
+}
+
+void processBlock(node::Node *node) { //<block> -> { <vars> <stats> }
+    node::Node *vars = node->getChildTwo()->getChildOne();
+    if(vars) { //<vars> -> empty | create Identifier ; | create Identifier := Integer ; <vars>
+        if(vars->getChildFour())
+            codeGeneration::produceVars(vars->getChildTwo()->getData().tokenInstance, vars->getChildFour()->getData().tokenInstance);
+        else 
+            codeGeneration::produceVars(vars->getChildTwo()->getData().tokenInstance, std::to_string(-7));
+    }
+    processStats(node->getChildThree());
+}
+
+void processStats(node::Node *node) { //<stats> -> <stat> <mStat>
+    processStat(node->getChildOne());
+    processMStat(node->getChildTwo());
+}
+
+void processMStat(node::Node *node) { //<mStat> -> empty | <stat> <mStat>
+    if(node == NULL || node->getChildOne() == NULL) return;
+    processStat(node->getChildOne());
+    processMStat(node->getChildTwo());
+}
+
+//Takes a subtree
+void codeGeneration::processIf(node::Node *node) { //<if> -> if [ <expr> <RO> <expr> ] then <stat>
+    //Evaluate both expressions, placing them into temporary variables
+    std::string exprTemp = codeGeneration::processExpr(node->getChildThree());
+    std::string exprTemp2 = codeGeneration::processExpr(node->getChildFive());
+
+    std::string op = node->getChildFour()->getChildOne()->getData().tokenInstance;
+    if(op == "<") {
+        _out << "LOAD T" + exprTemp + "\n";
+        _out << "SUB T" + exprTemp2 + "\n";
+        _out << "BRPOS L" + std::to_string(_labelCntr) + "\n"; //if(expr1 - expr2 > 0) Jump out
+    }
+    else if(op == ">") {
+        _out << "LOAD T" + exprTemp + "\n";
+        _out << "SUB T" + exprTemp2 + "\n"; 
+        _out << "BRNEG L" + std::to_string(_labelCntr) + "\n"; //if(expr1 - expr2 < 0) Jump out
+    }
+    else if(op == "==") {
+        _out << "LOAD T" + exprTemp + "\n";
+        _out << "SUB T" + exprTemp2 + "\n";
+        _out << "BRPOS L" + std::to_string(_labelCntr) + "\n"; //if(expr1 - expr2 != 0) Jump out
+        _out << "BRNEG L" + std::to_string(_labelCntr) + "\n"; //if(expr1 - expr2 != 0) Jump out
+    }
+    else if(op == "=!=") {
+        _out << "LOAD T" + exprTemp + "\n";
+        _out << "SUB T" + exprTemp2 + "\n";
+        _out << "BRZ L" + std::to_string(_labelCntr) + "\n"; //if(expr1 - expr2 == 0) Jump out
+    }
+
+    processStat(node->getChildEight());
+
+    std::string newLabel = "L" + std::to_string(_labelCntr);
+    _varIds.push(newLabel);
+    _labelCntr++;
+    codeGeneration::produceLabel(newLabel);
 }
 
 //Declares all stored identifiers

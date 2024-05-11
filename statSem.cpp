@@ -7,7 +7,7 @@
 #include <fstream>
 
 //Prototypes
-void processBlock(node::Node*);
+void processBlockScope(node::Node*);
 void processVars(node::Node*, symbolTable::Scope*);
 void processIdentifier(node::Node*, symbolTable::Scope*);
 void traversePreorder(node::Node*, symbolTable::Scope*);
@@ -37,7 +37,7 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
     if(root->getData().tokenInstance == "block()") {
         //std::cout << "Calling block()\n";
         //Create a new scope to operate in
-        processBlock(root);
+        processBlockScope(root);
         return;
     }
     else if(root->getData().tokenInstance == "vars()") {
@@ -87,13 +87,10 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         codeGeneration::processLoop2(root); //Send the entire subtree
         return;
     }
-    /*
-    TODO
     else if(root->getData().tokenInstance == "if()") { //<if> -> if [ <expr> <RO> <expr> ] then <stat>
         codeGeneration::processIf(root); //Send the entire subtree to if
         return;
     }
-    */
     else if(root->getData().tokenId == token::idTok) {
         //std::cout << "Line " << root->getData().lineNumber << ": calling processIdentifier() for " << root->getData().tokenInstance << std::endl;
         processIdentifier(root, scope);
@@ -112,7 +109,7 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
 }
 
 //Starts a local scope for new identifiers within the block
-void processBlock(node::Node *root) {
+void processBlockScope(node::Node *root) {
     symbolTable::Scope *scope = new symbolTable::Scope();
     //std::cout << "Entering a new block scope.\n";
 
