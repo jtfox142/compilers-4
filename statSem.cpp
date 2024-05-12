@@ -42,52 +42,26 @@ void traversePreorder(node::Node *root, symbolTable::Scope *scope) {
         return;
     }
     else if(root->getData().tokenInstance == "vars()") {
+        //TODO Bug: The only vars that will be loaded onto the stack are declared before tape or right after the first block starts.
+        //No vars produced as a child of <stats> will be processed by statsem
+        
         //Add the identifiers to the stack
-        //std::cout << "Calling vars()\n";
         processVars(root, scope);
         return;
     }
     else if(root->getData().tokenInstance == "func()") { //<func> -> func Identifier <block>
-        //skip processing func identifier in static semantics pass
-        //std::cout << "Calling func()\n";
-        //produce code generation for func
-        //codeGeneration::produceLabel(root->getChildTwo()->getData()); //TODO: wrong. Need to implement functions inplace
-        traversePreorder(root->getChildThree(), scope);
+        /*
+
+        What I need to do is 
+            * Upon declaration of func, create an object that holds a func identifier as well as the output for the asm.
+            * If goto(f1) is called, search for the object with f1 identifier and send the corresponding output to _out
+    
+        
+        traversePreorder(root->getChildThree(), scope);*/
         return;
     }
-    /*else if(root->getData().tokenInstance == "label()") { // <label> -> label Identifier
-        codeGeneration::produceLabel(root->getChildTwo()->getData().tokenInstance);
-        return;
-    }
-    else if(root->getData().tokenInstance == "goto()") { //<goto> -> jump Identifier
-        //skip processing function identifier in static semantics
-        //std::cout << "Skipping goto()\n";
-        //produce code gen for goto
-        codeGeneration::produceJump(root->getChildTwo()->getData());
-        return;
-    }
-    else if(root->getData().tokenInstance == "in()") { //<in> -> cin Identifier
-        codeGeneration::produceCin(root->getChildTwo()->getData());
-        return;
-    }
-    else if(root->getData().tokenInstance == "expr()") { //<expr> -> <N> - <expr> | <N>
-        codeGeneration::processExpr(root); //Send the entire subtree
-        return;
-    }
-    else if(root->getData().tokenInstance == "loop1()") { //<loop1> -> while [ <expr> <RO> <expr> ] <stat>
-        codeGeneration::processLoop1(root); //Send the entire subtree
-        return;
-    }
-    else if(root->getData().tokenInstance == "loop2()") { //<loop1> -> while [ <expr> <RO> <expr> ] <stat>
-        codeGeneration::processLoop2(root); //Send the entire subtree
-        return;
-    }
-    else if(root->getData().tokenInstance == "if()") { //<if> -> if [ <expr> <RO> <expr> ] then <stat>
-        codeGeneration::processIf(root); //Send the entire subtree to if
-        return;
-    }*/
     else if(root->getData().tokenInstance == "stats()") {
-        codeGeneration::processStats(root);
+        codeGeneration::processStats(root); //TODO Bug: if stats() returns a block(), it will not be processed in the static semantic check.
         return;
     }
     else if(root->getData().tokenId == token::idTok) {

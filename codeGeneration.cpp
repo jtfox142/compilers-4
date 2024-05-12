@@ -227,7 +227,7 @@ void codeGeneration::processLoop1(node::Node *node) { //<loop1> -> while [ <expr
     processStat(node->getChildSeven());
 
     //Jump back in by default
-    _out << "BR L" + std::to_string(_labelCntr - 1) + "\n";
+    _out << "BR " + newLabel + "\n";
 
     //Produce a label to jump out
     std::string newLabel2 = "L" + std::to_string(_labelCntr);
@@ -255,45 +255,23 @@ void codeGeneration::processLoop2(node::Node *node) { //<loop2> -> repeat <stat>
     if(op == "<") {
         _out << "LOAD T" + exprTemp + "\n";
         _out << "SUB T" + exprTemp2 + "\n";
-        _out << "BRPOS L" + std::to_string(_labelCntr - 1) + "\n"; //if(expr1 - expr2 > 0) Jump back in
+        _out << "BRPOS " + newLabel + "\n"; //if(expr1 - expr2 > 0) Jump back in
     }
     else if(op == ">") {
         _out << "LOAD T" + exprTemp + "\n";
         _out << "SUB T" + exprTemp2 + "\n"; 
-        _out << "BRNEG L" + std::to_string(_labelCntr - 1) + "\n"; //if(expr1 - expr2 < 0) Jump back in
+        _out << "BRNEG " + newLabel + "\n"; //if(expr1 - expr2 < 0) Jump back in
     }
     else if(op == "==") {
         _out << "LOAD T" + exprTemp + "\n";
         _out << "SUB T" + exprTemp2 + "\n";
-        _out << "BRPOS L" + std::to_string(_labelCntr - 1) + "\n"; //if(expr1 - expr2 != 0) Jump in
-        _out << "BRNEG L" + std::to_string(_labelCntr - 1) + "\n"; //if(expr1 - expr2 != 0) Jump in
+        _out << "BRPOS " + newLabel + "\n"; //if(expr1 - expr2 != 0) Jump in
+        _out << "BRNEG " + newLabel + "\n"; //if(expr1 - expr2 != 0) Jump in
     }
-    /*else if(op == "...") { //If ((expr1 DIV 2 MULT 2 SUB expr1) == 0) && ((expr2 DIV 2 MULT 2 SUB expr2), Jump back in
-        //Process if expr1 is even (equal to zero is even)
-        _out << "LOAD T" + exprTemp + "\n";
-        _out << "DIV 2\n";
-        _out << "MULT 2\n";
-        _out << "SUB T" + exprTemp + "\n";
-        std::string newTemp = std::to_string(_varCntr);
-        _varIds.push("T" + newTemp); //TODO I should really make a function for this
-        _varCntr++;
-        _out << "STORE T" + newTemp + "\n";
-
-        //Process if expr2 is even (equal to zero is even)
-        _out << "LOAD T" + exprTemp2 + "\n";
-        _out << "DIV 2\n";
-        _out << "MULT 2\n";
-        _out << "SUB T" + exprTemp2 + "\n";
-        
-        //If they are both odd, then both values will be negative
-        //If they are both even, then both values will be zero
-
-
-    }*/
     else if(op == "=!=") {
         _out << "LOAD T" + exprTemp + "\n";
         _out << "SUB T" + exprTemp2 + "\n";
-        _out << "BRZ L" + std::to_string(_labelCntr - 1) + "\n"; //if(expr1 - expr2 == 0) Jump IN
+        _out << "BRZ " + newLabel + "\n"; //if(expr1 - expr2 == 0) Jump IN
     }
 }
 
